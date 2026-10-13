@@ -1,0 +1,12 @@
+import { createClient } from "@supabase/supabase-js";
+
+const url = import.meta.env.VITE_SUPABASE_URL;
+const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+export const configured = Boolean(url && key);
+
+// Placeholder values keep the app from crashing before .env is filled in.
+export const supabase = createClient(
+  url || "https://placeholder.supabase.co",
+  key || "placeholder-key"
+);
