@@ -4,6 +4,7 @@ import { Plus, Pencil, Trash2 } from "lucide-react";
 import { supabase } from "../../lib/supabase.js";
 import { formatPrice } from "../../lib/utils.js";
 import ImageField from "../../components/ImageField.jsx";
+import ShareButton from "../../components/ShareButton.jsx";
 
 const EMPTY = { name: "", description: "", price: "", category: "", stock: 0, available: true, image_url: null };
 
@@ -80,11 +81,18 @@ export default function Products() {
     load();
   }
 
+  // Links that take customers straight to the store / a specific product
+  const storeUrl = `${window.location.origin}/store/${store.slug}`;
+  const productUrl = (p) => `${storeUrl}/product/${p.id}`;
+
   return (
     <>
       <div className="page-head">
         <h1>Products</h1>
-        <button className="btn btn-primary" onClick={() => setEditing(EMPTY)}><Plus size={16} /> Add product</button>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+          <ShareButton label="Share store" url={storeUrl} title={store.name} text={`Shop at ${store.name}`} />
+          <button className="btn btn-primary" onClick={() => setEditing(EMPTY)}><Plus size={16} /> Add product</button>
+        </div>
       </div>
 
       {loading ? <p>Loading...</p> : products.length === 0 ? (
@@ -105,6 +113,17 @@ export default function Products() {
                   <td className={p.stock === 0 ? "danger" : ""}>{p.stock === 0 ? "Sold out" : p.stock}</td>
                   <td>{p.available ? "Visible" : "Hidden"}</td>
                   <td className="actions">
+                    {/* Hidden products can't be opened by customers, so no share link for them */}
+                    {p.available && (
+                      <ShareButton
+                        variant="icon"
+                        className="share-flat"
+                        label={`Share ${p.name}`}
+                        url={productUrl(p)}
+                        title={p.name}
+                        text={`${p.name} - ${formatPrice(p.price)} | ${store.name}`}
+                      />
+                    )}
                     <button className="icon-btn" onClick={() => setEditing({ ...p, price: String(p.price) })} aria-label={`Edit ${p.name}`}><Pencil size={16} /></button>
                     <button className="icon-btn" onClick={() => remove(p)} aria-label={`Delete ${p.name}`}><Trash2 size={16} /></button>
                   </td>

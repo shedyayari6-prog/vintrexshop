@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, Outlet, useParams } from "react-router-dom";
-import { ShoppingBag } from "lucide-react";
 import { supabase } from "../../lib/supabase.js";
 import { FONT_OPTIONS, readableOn } from "../../lib/utils.js";
 import Watermark from "../../components/Watermark.jsx";
+import { Announcement, StoreHeader, StoreFooter, uniqueCategories } from "../../components/StoreChrome.jsx";
+import "../../store.css";
 
 // Loads the seller's chosen Google Font.
 export function useStoreTheme(font) {
@@ -98,26 +99,16 @@ export default function StoreLayout() {
     ...(store.bg_color ? { "--s-bg": store.bg_color, "--s-ink": bgInk } : {}),
   };
 
+  const categories = uniqueCategories(products);
+
   return (
     <div className="store-root" style={themeStyle}>
-      <header className="s-header">
-        <Link to={base} className="s-brand">
-          {store.logo_url && <img src={store.logo_url} alt="" />}
-          {store.name}
-        </Link>
-        <Link to={`${base}/cart`} className="s-cart" aria-label={`Cart, ${cart.count} items`}>
-          <ShoppingBag size={20} />
-          {cart.count > 0 && <span>{cart.count}</span>}
-        </Link>
-      </header>
+      <Announcement text={store.announcement} />
+      <StoreHeader store={store} base={base} categories={categories} count={cart.count} />
       <main className="s-main">
         <Outlet context={{ store, products, cart, base }} />
       </main>
-      <footer className="s-footer">
-        <span>{store.name}</span>
-        {store.phone && <a href={`tel:${store.phone}`}>{store.phone}</a>}
-        <small>Powered by VintrexShop</small>
-      </footer>
+      <StoreFooter store={store} base={base} categories={categories} />
       <Watermark />
     </div>
   );

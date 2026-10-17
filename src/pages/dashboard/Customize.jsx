@@ -3,8 +3,11 @@ import { useOutletContext } from "react-router-dom";
 import { supabase } from "../../lib/supabase.js";
 import { FONT_OPTIONS, readableOn } from "../../lib/utils.js";
 import { DEFAULT_DISCOUNT, priceProduct } from "../../lib/pricing.js";
+import { seedDemoProducts, removeDemoProducts } from "../../lib/demo.js";
 import ImageField from "../../components/ImageField.jsx";
-import StoreView from "../../components/StoreView.jsx";
+import StoreView, { DEFAULT_FAQS } from "../../components/StoreView.jsx";
+import { Announcement, StoreHeader, StoreFooter, uniqueCategories } from "../../components/StoreChrome.jsx";
+import "../../store.css";
 import Watermark from "../../components/Watermark.jsx";
 import { useStoreTheme } from "../store/StoreLayout.jsx";
 
@@ -14,6 +17,11 @@ const uid = () => Math.random().toString(36).slice(2, 9);
 const normalize = (s) => ({
   ...s,
   bg_color: s.bg_color ?? "",
+  announcement: s.announcement ?? "",
+  hero_eyebrow: s.hero_eyebrow ?? "",
+  hero_title: s.hero_title ?? "",
+  show_faq: s.show_faq ?? true,
+  faqs: s.faqs?.length ? s.faqs : DEFAULT_FAQS,
   offers: s.offers ?? [],
   discount: { ...DEFAULT_DISCOUNT, ...(s.discount || {}) },
 });
@@ -52,10 +60,24 @@ export default function Customize() {
   const set = (k, v) => { setMsg(""); setDraft((d) => ({ ...d, [k]: v })); };
   useStoreTheme(draft.font);
 
-  useEffect(() => {
+  const loadProducts = () =>
     supabase.from("products").select("*").eq("store_id", store.id).order("created_at", { ascending: false })
       .then(({ data }) => setProducts(data || []));
-  }, [store.id]);
+  useEffect(() => { loadProducts(); }, [store.id]);
+
+  // --- sample products ---
+  const [demoBusy, setDemoBusy] = useState(false);
+  const [demoMsg, setDemoMsg] = useState("");
+  const demoCount = products.filter((p) => p.is_demo).length;
+  async function runDemo(action) {
+    if (action === "remove" && !window.confirm("Delete all sample products? Products you added yourself stay.")) return;
+    setDemoBusy(true);
+    setDemoMsg("");
+    const err = await (action === "add" ? seedDemoProducts(supabase, store.id) : removeDemoProducts(supabase, store.id));
+    setDemoBusy(false);
+    if (err) return setDemoMsg(err.message);
+    await loadProducts();
+  }
 
   async function save() {
     setBusy(true);
@@ -64,6 +86,10 @@ export default function Customize() {
       ...fields,
       bg_color: fields.bg_color || null,
       offers: fields.offers.filter((o) => o.buy > 0 && o.free > 0),
+      announcement: fields.announcement || null,
+      hero_eyebrow: fields.hero_eyebrow || null,
+      hero_title: fields.hero_title || null,
+      faqs: fields.faqs.filter((f) => f.q.trim() && f.a.trim()),
     };
     const { data, error } = await supabase.from("stores").update(clean).eq("id", store.id).select().single();
     setBusy(false);
@@ -71,6 +97,11 @@ export default function Customize() {
     setStore(data);
     setMsg("Saved.");
   }
+
+  // --- questions ---
+  const setFaq = (i, patch) => set("faqs", draft.faqs.map((f, n) => (n === i ? { ...f, ...patch } : f)));
+  const addFaq = () => set("faqs", [...draft.faqs, { q: "", a: "" }]);
+  const removeFaq = (i) => set("faqs", draft.faqs.filter((_, n) => n !== i));
 
   // --- discount ---
   const d = draft.discount;
@@ -92,7 +123,7 @@ export default function Customize() {
     "--s-font": `'${draft.font}', 'Hanken Grotesk', sans-serif`,
     ...(draft.bg_color ? { "--s-bg": draft.bg_color, "--s-ink": bgInk, background: draft.bg_color, color: bgInk } : {}),
   };
-  const previewProducts = products.slice(0, 8).map((p) => priceProduct(p, draft));
+  const previewProducts = products.slice(0, 12).map((p) => priceProduct(p, draft));
 
   return (
     <>
@@ -112,12 +143,31 @@ export default function Customize() {
           </label>
 
           <fieldset className="cz-section">
+            <legend>Sample products</legend>
+            <small className="muted">
+              {products.length === 0
+                ? "Your store is empty. Add example products to see how it looks, then edit or delete them in Products."
+                : demoCount > 0
+                  ? `${demoCount} sample products are in your store. Edit or delete them in Products, or remove them all here.`
+                  : "Add 6 example products (tees, hoodies, cap...) to preview your design."}
+            </small>
+            <div className="variant-actions">
+              {demoCount === 0 && <button type="button" className="btn" onClick={() => runDemo("add")} disabled={demoBusy}>{demoBusy ? "Working..." : "Add sample products"}</button>}
+              {demoCount > 0 && <button type="button" className="btn btn-ghost danger" onClick={() => runDemo("remove")} disabled={demoBusy}>{demoBusy ? "Working..." : "Remove sample products"}</button>}
+            </div>
+            {demoMsg && <p className="msg msg-error" role="alert">{demoMsg}</p>}
+          </fieldset>
+
+          <fieldset className="cz-section">
             <legend>Store info</legend>
             <label>Store name<input value={draft.name} onChange={(e) => set("name", e.target.value)} /></label>
             <label>Tagline<input value={draft.tagline || ""} onChange={(e) => set("tagline", e.target.value)} placeholder="Streetwear made in Tunis" /></label>
             <label>Email for new-order alerts
               <input type="email" value={draft.notify_email || ""} onChange={(e) => set("notify_email", e.target.value)} placeholder="Leave empty to use your login email" />
             </label>
+            <label>Top banner message<input value={draft.announcement || ""} onChange={(e) => set("announcement", e.target.value)} placeholder="Free delivery on orders over 100 TND" /></label>
+            <label>Small text above the title<input value={draft.hero_eyebrow || ""} onChange={(e) => set("hero_eyebrow", e.target.value)} placeholder="New collection 2026" /></label>
+            <label>Big title (leave empty to use the store name)<input value={draft.hero_title || ""} onChange={(e) => set("hero_title", e.target.value)} placeholder="Streetwear that tells your story" /></label>
             <label>Phone (shown to customers)<input value={draft.phone || ""} onChange={(e) => set("phone", e.target.value)} placeholder="+216 20 000 000" /></label>
           </fieldset>
 
@@ -166,6 +216,23 @@ export default function Customize() {
             </label>
 
             <label className="check"><input type="checkbox" checked={draft.show_categories} onChange={(e) => set("show_categories", e.target.checked)} /> Show category filter</label>
+          </fieldset>
+
+          <fieldset className="cz-section">
+            <legend>Questions and answers</legend>
+            <label className="check"><input type="checkbox" checked={draft.show_faq} onChange={(e) => set("show_faq", e.target.checked)} /> Show questions section</label>
+            {draft.show_faq && (
+              <>
+                {draft.faqs.map((f, i) => (
+                  <div key={i} className="offer-card">
+                    <label>Question<input value={f.q} onChange={(e) => setFaq(i, { q: e.target.value })} /></label>
+                    <label>Answer<textarea rows={2} value={f.a} onChange={(e) => setFaq(i, { a: e.target.value })} /></label>
+                    <button type="button" className="btn btn-ghost danger" onClick={() => removeFaq(i)}>Remove</button>
+                  </div>
+                ))}
+                <button type="button" className="btn" onClick={addFaq}>Add a question</button>
+              </>
+            )}
           </fieldset>
 
           <fieldset className="cz-section">
@@ -222,13 +289,12 @@ export default function Customize() {
         <div className="preview-frame">
           <div className="preview-bar">Live preview</div>
           <div className="store-root" style={themeStyle}>
-            <header className="s-header">
-              <span className="s-brand">
-                {draft.logo_url && <img src={draft.logo_url} alt="" />}
-                {draft.name}
-              </span>
-            </header>
-            <StoreView store={draft} products={previewProducts} />
+            <Announcement text={draft.announcement} />
+            <StoreHeader store={draft} categories={uniqueCategories(products)} />
+            <main className="s-main">
+              <StoreView store={draft} products={previewProducts} />
+            </main>
+            <StoreFooter store={draft} categories={uniqueCategories(products)} />
             <Watermark />
           </div>
         </div>

@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { configured } from "./lib/supabase";
 import Landing from "./pages/Landing.jsx";
+import { Privacy, Terms, Contact } from "./pages/Legal.jsx";
 import AuthPage from "./pages/AuthPage.jsx";
 import DashboardLayout from "./pages/dashboard/DashboardLayout.jsx";
 import Products from "./pages/dashboard/Products.jsx";
@@ -30,6 +31,11 @@ export default function App() {
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<AuthPage mode="login" />} />
       <Route path="/signup" element={<AuthPage mode="signup" />} />
+
+      {/* Public pages (needed for AdSense) */}
+      <Route path="/privacy" element={<Privacy />} />
+      <Route path="/terms" element={<Terms />} />
+      <Route path="/contact" element={<Contact />} />
 
       <Route path="/dashboard" element={<DashboardLayout />}>
         <Route index element={<Navigate to="stats" replace />} />

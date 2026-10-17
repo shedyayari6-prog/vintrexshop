@@ -1,7 +1,7 @@
 // Change these in one place.
 
 // Text of the diagonal watermark shown across every public store page.
-export const WATERMARK_TEXT = "VYNTREX";
+export const WATERMARK_TEXT = "VINTREXSHOP";
 
 // Login buttons shown on the sign-in and sign-up pages.
 // Each provider must also be switched on in Supabase > Authentication > Providers.

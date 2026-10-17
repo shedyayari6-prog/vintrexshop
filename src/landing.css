@@ -1,0 +1,101 @@
+/* Landing + legal pages. Import after index.css. Uses the tokens from index.css. */
+
+.lp-wrap { width: 100%; max-width: 1120px; margin: 0 auto; padding: 0 clamp(16px, 5vw, 40px); }
+.lp-sec { padding: clamp(48px, 8vw, 96px) 0 0; }
+.lp-tint { background: #F3EFE5; margin-top: clamp(48px, 8vw, 96px); padding-bottom: clamp(48px, 8vw, 96px); }
+.lp-head { max-width: 640px; margin-bottom: 32px; }
+.lp-head h2 { font-size: clamp(1.8rem, 4vw, 2.6rem); margin-bottom: .3em; }
+.lp-head p { color: var(--muted); margin: 0; }
+
+/* popular stores */
+.lp-stores { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); gap: 20px; }
+.lp-store { display: block; text-decoration: none; background: var(--paper); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; transition: box-shadow .2s, transform .2s; }
+.lp-store:hover { box-shadow: 0 10px 28px rgba(23, 33, 43, .12); transform: translateY(-2px); }
+.lp-store-img { display: block; aspect-ratio: 16 / 9; overflow: hidden; }
+.lp-store-img img { width: 100%; height: 100%; object-fit: cover; }
+.lp-store-body { display: flex; align-items: center; gap: 12px; padding: 14px 16px; }
+.lp-store-body > span { flex: 1; min-width: 0; display: grid; }
+.lp-store-body strong { font-family: var(--display); font-size: 1.05rem; }
+.lp-store-body small { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lp-store-logo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+.lp-store-initial { display: grid; place-items: center; background: var(--teal); color: #fff; font-family: var(--display); }
+
+/* steps: this content really is a sequence, so numbers carry meaning */
+.lp-steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 28px; }
+.lp-steps span { display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--teal); color: #fff; font-weight: 700; margin-bottom: 12px; }
+.lp-steps h3 { font-size: 1.15rem; margin-bottom: .3em; }
+.lp-steps p { margin: 0; color: var(--muted); }
+
+.lp-feats { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+.lp-feats article { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 24px; }
+.lp-feats svg { color: var(--teal); margin-bottom: 12px; }
+.lp-feats h3 { font-size: 1.15rem; }
+.lp-feats p { margin: 0; color: var(--muted); }
+
+/* faq */
+.lp-faq { display: grid; grid-template-columns: 1fr 1.6fr; gap: clamp(24px, 5vw, 72px); align-items: start; }
+.lp-faq details { border-bottom: 1px solid var(--line); }
+.lp-faq summary { padding: 20px 0; font-weight: 600; cursor: pointer; }
+.lp-faq details p { margin: -4px 0 20px; color: var(--muted); max-width: 60ch; }
+@media (max-width: 760px) { .lp-faq { grid-template-columns: 1fr; } }
+
+.lp-cta { text-align: center; padding: clamp(56px, 9vw, 110px) 20px; }
+.lp-cta h2 { font-size: clamp(1.8rem, 4vw, 2.6rem); }
+.lp-cta p { color: var(--muted); margin: 0 0 22px; }
+
+/* footer */
+.landing-foot { border-top: 1px solid var(--line); padding: 24px 0; color: var(--muted); font-size: .92rem; }
+.lp-foot { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.lp-foot nav { display: flex; gap: 20px; flex-wrap: wrap; }
+.lp-foot a { text-decoration: none; }
+.lp-foot a:hover { color: var(--ink); text-decoration: underline; }
+
+/* legal pages */
+.lp-doc { max-width: 760px; margin: 0 auto; padding: 24px clamp(16px, 5vw, 40px) 72px; }
+.lp-doc h1 { font-size: clamp(2rem, 5vw, 2.8rem); }
+.lp-doc h2 { font-size: 1.35rem; margin-top: 2em; }
+.lp-doc h3 { font-size: 1.05rem; margin-top: 1.4em; }
+.lp-doc p, .lp-doc li { line-height: 1.7; max-width: 68ch; }
+.lp-doc a:not(.btn) { color: var(--teal); }
+
+/* hero with the GridMotion wall (React Bits) behind the text */
+.hero-wrap { position: relative; overflow: hidden; }
+.hero-bg { position: absolute; inset: 0; z-index: 0; }
+/* the wash only sits behind the text, so the tiles stay clear everywhere else */
+.hero-bg::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse 62% 90% at 24% 52%,
+    rgba(251,250,247,.95) 0%, rgba(251,250,247,.86) 40%, rgba(251,250,247,.35) 72%, rgba(251,250,247,0) 100%); }
+.hero-wrap .landing-hero { position: relative; z-index: 1; }
+.gm-tile { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; color: #fff; }
+.gm-icon { display: grid; place-items: center; width: 68px; height: 68px; border-radius: 50%; background: rgba(255, 255, 255, .2); }
+.gm-label { font-family: var(--display); font-weight: 700; font-size: 1rem; letter-spacing: -.01em; }
+@media (max-width: 760px) {
+  .hero-bg::after { background: rgba(251,250,247,.8); }
+  .gm-icon { width: 52px; height: 52px; }
+  .gm-icon svg { width: 28px; height: 28px; }
+}
+.gm-tile.gm-photo {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  overflow: hidden;
+  background: #e6ecee;
+}
+.gm-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* popular stores: 3D ring (React Bits CircularCarousel) */
+/* the ring breaks out of the page column and uses the full screen width */
+.lp-wide { overflow-x: clip; }
+.lp-ring { position: relative; width: 100vw; left: 50%; margin: 8px 0 0 -50vw; height: 580px; }
+.lp-ring-actions { display: flex; flex-direction: column; align-items: center; gap: 14px; margin-top: 8px; text-align: center; }
+.lp-ring-links { margin: 0; color: var(--muted); font-size: .92rem; max-width: 70ch; }
+.lp-ring-links a { color: var(--teal); text-decoration: none; font-weight: 600; }
+.lp-ring-links a:hover { text-decoration: underline; }
+@media (max-width: 760px) { .lp-ring { height: 460px; } }

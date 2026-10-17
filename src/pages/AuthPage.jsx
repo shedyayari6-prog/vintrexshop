@@ -1,17 +1,12 @@
-import { useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../lib/AuthContext.jsx";
 import OAuthButtons from "../components/OAuthButtons.jsx";
 import Brand from "../components/Brand.jsx";
 
+// Sign in and sign up are the same thing now: the account buttons below create the account the first time.
 export default function AuthPage({ mode }) {
   const isSignup = mode === "signup";
-  const { user, loading, signIn, signUp } = useAuth();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
-  const [info, setInfo] = useState("");
+  const { user, loading } = useAuth();
 
   if (loading) {
     return (
@@ -25,48 +20,24 @@ export default function AuthPage({ mode }) {
 
   if (user) return <Navigate to="/dashboard" replace />;
 
-  async function onSubmit(e) {
-    e.preventDefault();
-    setError("");
-    setInfo("");
-    if (password.length < 6) return setError("Password needs at least 6 characters.");
-    setBusy(true);
-    const { data, error } = isSignup ? await signUp(email, password) : await signIn(email, password);
-    setBusy(false);
-    if (error) return setError(error.message);
-    if (isSignup && !data.session) {
-      return setInfo("Check your email and click the confirmation link, then log in.");
-    }
-  }
-
   return (
-    <div className="auth-wrap">
-      <form className="auth-card" onSubmit={onSubmit}>
+    <div className="auth-wrap auth-oauth-only">
+      {/* The "or use your email" line inside OAuthButtons has nothing below it now, so it is hidden here. */}
+      <style>{`.auth-oauth-only .or { display: none; }`}</style>
+      <div className="auth-card">
         <Brand />
         <h1>{isSignup ? "Open your store" : "Welcome back"}</h1>
+        <p className="muted">
+          {isSignup ? "Choose an account below to create your store." : "Choose your account below to log in."}
+        </p>
 
         <OAuthButtons />
 
-        <label>Email
-          <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
-        </label>
-        <label>Password
-          <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)}
-            autoComplete={isSignup ? "new-password" : "current-password"} />
-        </label>
-
-        {error && <p className="msg msg-error" role="alert">{error}</p>}
-        {info && <p className="msg msg-ok">{info}</p>}
-
-        <button className="btn btn-primary btn-block" disabled={busy}>
-          {busy ? "Please wait..." : isSignup ? "Create account" : "Log in"}
-        </button>
-
         <p className="auth-switch">
-          {isSignup ? <>Already have an account? <Link to="/login">Log in</Link></>
+          {isSignup ? <>Already have a store? <Link to="/login">Log in</Link></>
                     : <>New here? <Link to="/signup">Open your store</Link></>}
         </p>
-      </form>
+      </div>
     </div>
   );
 }

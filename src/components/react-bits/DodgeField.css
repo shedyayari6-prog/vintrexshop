@@ -1,0 +1,4 @@
+.dodge-field { display: inline-block; }
+.dodge-field__inner { display: block; will-change: transform; }
+/* while it is away from home, float above neighbouring content */
+.dodge-field__inner.is-away { position: relative; z-index: 30; }
