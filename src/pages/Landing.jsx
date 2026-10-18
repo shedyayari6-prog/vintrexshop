@@ -10,6 +10,7 @@ import Brand from "../components/Brand.jsx";
 import GridMotion from "../components/react-bits/GridMotion.jsx";
 import CircularCarousel from "../components/react-bits/CircularCarousel.jsx";
 import "../landing.css";
+import { useSeo } from "../lib/seo.js";
 
 // If an animated piece ever fails, show a fallback (or nothing) instead of a blank screen.
 class SafeBackground extends Component {
@@ -197,6 +198,11 @@ function PopularStores() {
 
 export default function Landing() {
   const { user } = useAuth();
+  useSeo({
+  title: "VintrexShop - Open Your Online Store, Cash on Delivery",
+  description: "Create your own online store in minutes with VintrexShop. Add products, choose your colors, share one link and get paid in cash on delivery.",
+  path: "/",
+});
   return (
     <div className="landing">
       <header className="landing-nav">
