@@ -6,11 +6,11 @@ import {
 } from "lucide-react";
 import { useAuth } from "../lib/AuthContext.jsx";
 import { supabase } from "../lib/supabase.js";
+import { useSeo } from "../lib/seo.js";
 import Brand from "../components/Brand.jsx";
 import GridMotion from "../components/react-bits/GridMotion.jsx";
 import CircularCarousel from "../components/react-bits/CircularCarousel.jsx";
 import "../landing.css";
-import { useSeo } from "../lib/seo.js";
 
 // If an animated piece ever fails, show a fallback (or nothing) instead of a blank screen.
 class SafeBackground extends Component {
@@ -18,6 +18,46 @@ class SafeBackground extends Component {
   static getDerivedStateFromError() { return { failed: true }; }
   componentDidCatch(error) { console.error("Animated component failed:", error); }
   render() { return this.state.failed ? (this.props.fallback ?? null) : this.props.children; }
+}
+
+/* ------------------------------------------------------------------ */
+/* Speed helpers                                                       */
+/* ------------------------------------------------------------------ */
+
+// Phones narrower than this get a plain hero background. The moving photo wall is heavy for a phone.
+const WALL_MIN_WIDTH = 761;
+
+// True a moment after the page has painted, so the wall never delays the headline. Never true on phones.
+function useWallReady() {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    if (window.innerWidth < WALL_MIN_WIDTH) return undefined;
+    const start = () => setReady(true);
+    if ("requestIdleCallback" in window) {
+      const id = window.requestIdleCallback(start, { timeout: 1500 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = setTimeout(start, 700);
+    return () => clearTimeout(id);
+  }, []);
+  return ready;
+}
+
+// True once the element is close to the screen. Used to load the store ring only when it is about to be seen.
+function useInView(rootMargin = "400px") {
+  const ref = useRef(null);
+  const [seen, setSeen] = useState(false);
+  useEffect(() => {
+    if (seen) return undefined;
+    const el = ref.current;
+    if (!el || typeof IntersectionObserver === "undefined") { setSeen(true); return undefined; }
+    const io = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) { setSeen(true); io.disconnect(); }
+    }, { rootMargin });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [seen, rootMargin]);
+  return [ref, seen];
 }
 
 const STEPS = [
@@ -108,7 +148,7 @@ function StoreGrid({ stores }) {
               {s.banner_url && <img src={s.banner_url} alt="" loading="lazy" />}
             </span>
             <span className="lp-store-body">
-              {s.logo_url ? <img className="lp-store-logo" src={s.logo_url} alt="" /> : <b className="lp-store-logo lp-store-initial">{s.name.slice(0, 1)}</b>}
+              {s.logo_url ? <img className="lp-store-logo" src={s.logo_url} alt="" width="40" height="40" loading="lazy" /> : <b className="lp-store-logo lp-store-initial">{s.name.slice(0, 1)}</b>}
               <span>
                 <strong>{s.name}</strong>
                 <small>{s.tagline || "Visit store"}</small>
@@ -126,11 +166,17 @@ function PopularStores() {
   const navigate = useNavigate();
   const [stores, setStores] = useState([]);
   const [active, setActive] = useState(0);
+  const [loaded, setLoaded] = useState(false);
   const activeRef = useRef(0);
+  const [ringRef, ringNear] = useInView();
 
   useEffect(() => {
     let off = false;
-    supabase.rpc("popular_stores", { p_limit: 8 }).then(({ data }) => { if (!off && data) setStores(data); });
+    supabase.rpc("popular_stores", { p_limit: 8 }).then(({ data }) => {
+      if (off) return;
+      if (data) setStores(data);
+      setLoaded(true);
+    });
     return () => { off = true; };
   }, []);
 
@@ -141,6 +187,14 @@ function PopularStores() {
     return Array.from({ length: 8 }, (_, i) => base[i % base.length]);
   }, [stores]);
 
+  // while the stores load, keep the space free so the page below does not jump
+  if (!loaded) {
+    return (
+      <section className="lp-sec lp-wide" aria-hidden="true">
+        <div className="lp-wrap"><div style={{ minHeight: 720 }} /></div>
+      </section>
+    );
+  }
   if (!stores.length) return null;
   const ring = stores.length >= 2;
   const current = stores.find((s) => s.slug === ringItems[active]?.slug) || stores[0];
@@ -160,8 +214,8 @@ function PopularStores() {
         {ring ? (
           <>
             <SafeBackground fallback={<StoreGrid stores={stores} />}>
-              <div className="lp-ring">
-                <CircularCarousel
+              <div className="lp-ring" ref={ringRef}>
+                {ringNear && <CircularCarousel
                   items={ringItems}
                   preset="cylinder"
                   intro="rise"
@@ -175,7 +229,7 @@ function PopularStores() {
                   depthFade={0.5}
                   onChange={(i) => { activeRef.current = i; setActive(i); }}
                   onItemClick={(item, index) => { if (index === activeRef.current) navigate(`/store/${item.slug}`); }}
-                />
+                />}
               </div>
             </SafeBackground>
             <div className="lp-ring-actions">
@@ -198,11 +252,12 @@ function PopularStores() {
 
 export default function Landing() {
   const { user } = useAuth();
+  const wallReady = useWallReady();
   useSeo({
-  title: "VintrexShop - Open Your Online Store, Cash on Delivery",
-  description: "Create your own online store in minutes with VintrexShop. Add products, choose your colors, share one link and get paid in cash on delivery.",
-  path: "/",
-});
+    title: "VintrexShop - Open Your Online Store, Cash on Delivery",
+    description: "Create your own online store in minutes with VintrexShop. Add products, choose your colors, share one link and get paid in cash on delivery.",
+    path: "/",
+  });
   return (
     <div className="landing">
       <header className="landing-nav">
@@ -221,11 +276,13 @@ export default function Landing() {
 
       <main>
         <div className="hero-wrap">
-          <div className="hero-bg" aria-hidden="true">
-            <SafeBackground>
-              <GridMotion items={GM_ITEMS} rows={3} aspectRatio={1.15} gap={14} radius={18} angle={-8}
-                speed={16} direction="alternate" parallax={0.4} spotlight={0.6} dim={0.05} fade={0.25} theme="light" />
-            </SafeBackground>
+          <div className="hero-bg" aria-hidden="true" style={{ background: "linear-gradient(135deg, #E7EFF0 0%, #FBFAF7 70%)" }}>
+            {wallReady && (
+              <SafeBackground>
+                <GridMotion items={GM_ITEMS} rows={3} aspectRatio={1.15} gap={14} radius={18} angle={-8}
+                  speed={16} direction="alternate" parallax={0.4} spotlight={0.6} dim={0.05} fade={0.25} theme="light" />
+              </SafeBackground>
+            )}
           </div>
           <section className="landing-hero">
             <h1>Your shop gets its own address.</h1>

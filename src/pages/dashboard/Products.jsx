@@ -5,8 +5,9 @@ import { supabase } from "../../lib/supabase.js";
 import { formatPrice } from "../../lib/utils.js";
 import ImageField from "../../components/ImageField.jsx";
 import ShareButton from "../../components/ShareButton.jsx";
+import VariantsField, { cleanOptions } from "../../components/VariantsField.jsx";
 
-const EMPTY = { name: "", description: "", price: "", category: "", stock: 0, available: true, image_url: null };
+const EMPTY = { name: "", description: "", price: "", category: "", stock: 0, available: true, image_url: null, options: [] };
 
 function ProductForm({ initial, storeId, userId, onClose, onSaved }) {
   const [form, setForm] = useState(initial);
@@ -29,12 +30,16 @@ function ProductForm({ initial, storeId, userId, onClose, onSaved }) {
       stock: Math.max(0, parseInt(form.stock, 10) || 0),
       available: form.available,
       image_url: form.image_url,
+      options: cleanOptions(form.options),
     };
     const { error } = form.id
       ? await supabase.from("products").update(row).eq("id", form.id)
       : await supabase.from("products").insert({ ...row, store_id: storeId });
     setBusy(false);
-    if (error) return setError(error.message);
+    if (error) {
+      const hint = /options/i.test(error.message) ? " Run the SQL line that adds the options column in Supabase first." : "";
+      return setError(error.message + hint);
+    }
     onSaved();
   }
 
@@ -50,6 +55,7 @@ function ProductForm({ initial, storeId, userId, onClose, onSaved }) {
         </div>
         <label>Category<input value={form.category} onChange={(e) => set("category", e.target.value)} placeholder="T-shirts" /></label>
         <label>Description<textarea rows={3} value={form.description} onChange={(e) => set("description", e.target.value)} /></label>
+        <VariantsField value={form.options || []} onChange={(v) => set("options", v)} />
         <label className="check"><input type="checkbox" checked={form.available} onChange={(e) => set("available", e.target.checked)} /> Show in store</label>
         {error && <p className="msg msg-error" role="alert">{error}</p>}
         <div className="modal-actions">
@@ -124,7 +130,7 @@ export default function Products() {
                         text={`${p.name} - ${formatPrice(p.price)} | ${store.name}`}
                       />
                     )}
-                    <button className="icon-btn" onClick={() => setEditing({ ...p, price: String(p.price) })} aria-label={`Edit ${p.name}`}><Pencil size={16} /></button>
+                    <button className="icon-btn" onClick={() => setEditing({ ...p, price: String(p.price), options: p.options || [] })} aria-label={`Edit ${p.name}`}><Pencil size={16} /></button>
                     <button className="icon-btn" onClick={() => remove(p)} aria-label={`Delete ${p.name}`}><Trash2 size={16} /></button>
                   </td>
                 </tr>

@@ -1,0 +1,46 @@
+/* Circles for colors and sizes: round "+" button, editor panel, sold-out look.
+   Works together with the .swatch styles already in your CSS. */
+
+.swatch { position: relative; }
+.swatch:disabled { cursor: not-allowed; }
+
+/* a sold-out circle is faded and crossed out */
+.swatch.is-out { opacity: .5; cursor: not-allowed; }
+.swatch.is-out::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(to top right, transparent calc(50% - 1px), #C8553D calc(50% - 1px), #C8553D calc(50% + 1px), transparent calc(50% + 1px));
+}
+
+/* the circle being edited in the dashboard */
+.swatch.is-edit { outline: 2px solid var(--teal, #0F4C5C); outline-offset: 2px; }
+
+/* the round "+" button */
+.vf-plus {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px dashed var(--teal, #0F4C5C);
+  background: #fff;
+  color: var(--teal, #0F4C5C);
+  cursor: pointer;
+  flex: none;
+}
+.vf-plus[aria-expanded="true"] { background: var(--teal, #0F4C5C); color: #fff; border-style: solid; }
+.vf-add-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.vf-add-row .muted { margin: 0; }
+.vf-menu { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* editor for one circle */
+.vf-panel { display: grid; gap: 10px; padding: 12px; border: 1px solid var(--line, #E3DFD6); border-radius: 10px; background: #fff; }
+.vf-panel-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.vf-panel-row input[type="color"] { width: 46px; flex: none; }
+.vf-panel-row input:not([type="color"]) { flex: 1; min-width: 120px; }
+.vf-panel .check { margin: 0; }
+.vf-legend { margin: 0; font-size: .85rem; opacity: .7; }

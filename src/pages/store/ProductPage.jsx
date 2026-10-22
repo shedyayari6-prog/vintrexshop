@@ -16,9 +16,11 @@ export default function ProductPage() {
     return <div className="s-empty"><p>Product not found.</p><Link to={base}>Back to store</Link></div>;
   }
   const product = priceProduct(raw, store);
-  const options = product.options || [];
-  const missing = options.find((g) => g.values.length && !choice[g.type]);
-  const soldOut = product.stock <= 0;
+  const options = (product.options || []).filter((g) => g.values && g.values.length);
+  const missing = options.find((g) => !choice[g.type]);
+  // sold out when the stock is 0, or when every color (or every size) has been marked sold out
+  const optionGone = options.some((g) => g.values.every((v) => v.soldOut));
+  const soldOut = product.stock <= 0 || optionGone;
 
   return (
     <div className="s-product">
@@ -48,7 +50,7 @@ export default function ProductPage() {
             <p className="danger">Sold out</p>
           ) : (
             <>
-              {options.filter((g) => g.values.length).map((g) => (
+              {options.map((g) => (
                 <div key={g.type}>
                   <span className="field-label">{g.type === "color" ? "Color" : "Size"}{choice[g.type] ? `: ${choice[g.type]}` : ""}</span>
                   <VariantPicker options={[g]} selected={choice} onSelect={(t, v) => setChoice((c) => ({ ...c, [t]: v }))} />
