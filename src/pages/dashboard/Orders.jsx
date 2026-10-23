@@ -3,21 +3,22 @@ import { useOutletContext } from "react-router-dom";
 import { Check, ChevronDown, Copy, MessageCircle, Phone, RefreshCw, Search } from "lucide-react";
 import { supabase } from "../../lib/supabase.js";
 import { formatPrice } from "../../lib/utils.js";
+import AbmShipping from "../../components/AbmShipping.jsx";
 
 const STATUSES = [
-  ["new", "New"],
-  ["confirmed", "Confirmed"],
-  ["shipped", "Shipped"],
-  ["delivered", "Delivered"],
-  ["cancelled", "Cancelled"],
+  ["new", "Nouvelle"],
+  ["confirmed", "Confirmée"],
+  ["shipped", "Expédiée"],
+  ["delivered", "Livrée"],
+  ["cancelled", "Annulée"],
 ];
 const LABEL = Object.fromEntries(STATUSES);
 
 // The natural next step for an order, shown as one quick button
 const NEXT = {
-  new: ["confirmed", "Confirm order"],
-  confirmed: ["shipped", "Mark as shipped"],
-  shipped: ["delivered", "Mark as delivered"],
+  new: ["confirmed", "Confirmer la commande"],
+  confirmed: ["shipped", "Marquer comme expédiée"],
+  shipped: ["delivered", "Marquer comme livrée"],
 };
 
 const startOfDay = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
@@ -25,8 +26,8 @@ const startOfDay = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).g
 function dayLabel(iso) {
   const d = new Date(iso);
   const diff = Math.round((startOfDay(new Date()) - startOfDay(d)) / 86400000);
-  if (diff === 0) return "Today";
-  if (diff === 1) return "Yesterday";
+  if (diff === 0) return "Aujourd'hui";
+  if (diff === 1) return "Hier";
   return d.toLocaleDateString("fr-TN", { weekday: "long", day: "numeric", month: "long" });
 }
 
@@ -77,10 +78,15 @@ export default function Orders() {
     const { error: updateError } = await supabase.from("orders").update({ status }).eq("id", id);
     if (updateError) {
       setOrders(previous);
-      setError("Couldn't update the order: " + updateError.message);
+      setError("Impossible de mettre à jour la commande : " + updateError.message);
     } else {
       setError("");
     }
+  }
+
+  // Merge fields returned by the ABM function (tracking number, status...) into one order
+  function patchOrder(id, patch) {
+    setOrders((list) => list.map((o) => (o.id === id ? { ...o, ...patch } : o)));
   }
 
   async function copyDetails(o) {
@@ -135,34 +141,34 @@ export default function Orders() {
   return (
     <>
       <div className="page-head ord-head">
-        <h1>Orders</h1>
+        <h1>Commandes</h1>
         <button type="button" className="ord-refresh" onClick={load} disabled={loading}>
-          <RefreshCw size={15} className={loading ? "ord-spin" : ""} /> Refresh
+          <RefreshCw size={15} className={loading ? "ord-spin" : ""} /> Actualiser
         </button>
       </div>
 
       <div className="ord-stats">
         <div className="ord-stat">
-          <span>All orders</span>
+          <span>Toutes les commandes</span>
           <strong>{stats.total}</strong>
         </div>
         <div className={`ord-stat ${stats.fresh ? "ord-stat-alert" : ""}`}>
-          <span>New, need action</span>
+          <span>Nouvelles, à traiter</span>
           <strong>{stats.fresh}</strong>
         </div>
         <div className="ord-stat">
-          <span>On the way</span>
+          <span>En route</span>
           <strong>{stats.toDeliver}</strong>
         </div>
         <div className="ord-stat">
-          <span>Revenue (not cancelled)</span>
+          <span>Chiffre d'affaires (hors annulées)</span>
           <strong>{formatPrice(stats.revenue)}</strong>
         </div>
       </div>
 
       <div className="ord-toolbar">
-        <div className="ord-filters" role="tablist" aria-label="Filter orders by status">
-          {[["all", "All"], ...STATUSES].map(([value, label]) => (
+        <div className="ord-filters" role="tablist" aria-label="Filtrer les commandes par statut">
+          {[["all", "Toutes"], ...STATUSES].map(([value, label]) => (
             <button
               key={value}
               type="button"
@@ -181,7 +187,7 @@ export default function Orders() {
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search name, phone, city or order #"
+            placeholder="Rechercher un nom, un téléphone, une ville ou un n° de commande"
           />
         </label>
       </div>
@@ -189,11 +195,11 @@ export default function Orders() {
       {error && <p className="msg msg-error" role="alert">{error}</p>}
 
       {loading && orders.length === 0 ? (
-        <p>Loading...</p>
+        <p>Chargement...</p>
       ) : orders.length === 0 ? (
-        <div className="empty"><p>No orders yet. When a customer checks out, the order shows up here.</p></div>
+        <div className="empty"><p>Aucune commande pour le moment. Quand un client passe commande, elle apparaît ici.</p></div>
       ) : visible.length === 0 ? (
-        <div className="empty"><p>No orders match this filter.</p></div>
+        <div className="empty"><p>Aucune commande ne correspond à ce filtre.</p></div>
       ) : (
         groups.map((group) => (
           <section className="ord-group" key={group.label}>
@@ -215,7 +221,7 @@ export default function Orders() {
                   >
                     <span className="ord-id">#{shortId(o.id)}<small>{timeLabel(o.created_at)}</small></span>
                     <span className="ord-customer"><strong>{o.customer_name}</strong><small>{o.city}</small></span>
-                    <span className="ord-count">{itemCount} {itemCount === 1 ? "item" : "items"}</span>
+                    <span className="ord-count">{itemCount} {itemCount > 1 ? "articles" : "article"}</span>
                     <span className={`ord-badge ord-badge-${o.status}`}>{LABEL[o.status] || o.status}</span>
                     <strong className="ord-total">{formatPrice(o.total)}</strong>
                     <ChevronDown size={18} className="ord-chevron" />
@@ -225,15 +231,15 @@ export default function Orders() {
                     <div className="ord-detail">
                       <div className="ord-cols">
                         <div>
-                          <h3>Customer</h3>
+                          <h3>Client</h3>
                           <p><strong>{o.customer_name}</strong></p>
                           <p><a href={`tel:${o.phone}`}>{o.phone}</a></p>
                           <p>{o.address}, {o.city}</p>
-                          {o.note && <p className="ord-note">“{o.note}”</p>}
+                          {o.note && <p className="ord-note">« {o.note} »</p>}
                         </div>
 
                         <div>
-                          <h3>Items</h3>
+                          <h3>Articles</h3>
                           <ul className="ord-items">
                             {items.map((i) => (
                               <li key={i.id}>
@@ -243,11 +249,13 @@ export default function Orders() {
                             ))}
                           </ul>
                           <div className="ord-sum">
-                            <span>Pay on delivery</span>
+                            <span>Paiement à la livraison</span>
                             <strong>{formatPrice(o.total)}</strong>
                           </div>
                         </div>
                       </div>
+
+                      <AbmShipping order={o} store={store} onPatch={patchOrder} />
 
                       <div className="ord-actions">
                         {next && (
@@ -255,20 +263,20 @@ export default function Orders() {
                             {next[1]}
                           </button>
                         )}
-                        <a className="ord-btn" href={`tel:${o.phone}`}><Phone size={14} /> Call</a>
+                        <a className="ord-btn" href={`tel:${o.phone}`}><Phone size={14} /> Appeler</a>
                         <a
                           className="ord-btn"
-                          href={whatsappLink(o.phone, `Hello ${o.customer_name}, this is ${store.name} about your order #${shortId(o.id)}.`)}
+                          href={whatsappLink(o.phone, `Bonjour ${o.customer_name}, ici ${store.name} au sujet de votre commande #${shortId(o.id)}.`)}
                           target="_blank"
                           rel="noreferrer"
                         >
                           <MessageCircle size={14} /> WhatsApp
                         </a>
                         <button type="button" className="ord-btn" onClick={() => copyDetails(o)}>
-                          {copiedId === o.id ? <><Check size={14} /> Copied</> : <><Copy size={14} /> Copy address</>}
+                          {copiedId === o.id ? <><Check size={14} /> Copié</> : <><Copy size={14} /> Copier l'adresse</>}
                         </button>
                         <label className="ord-select">
-                          Status
+                          Statut
                           <select value={o.status} onChange={(e) => setStatus(o.id, e.target.value)}>
                             {STATUSES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                           </select>

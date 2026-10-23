@@ -61,24 +61,24 @@ function useInView(rootMargin = "400px") {
 }
 
 const STEPS = [
-  { t: "Create your store", d: "Sign up with your email and choose the name and address of your shop." },
-  { t: "Add your products", d: "Upload photos, set prices and stock, and add colors and sizes where they matter." },
-  { t: "Share your link", d: "Send it on Instagram, Facebook or WhatsApp. Customers pick a product and order in a minute." },
-  { t: "Confirm and deliver", d: "Each order arrives in your dashboard with the phone number and address. Call, confirm, ship." },
+  { t: "Créez votre boutique", d: "Inscrivez-vous avec votre e-mail et choisissez le nom et l'adresse de votre boutique." },
+  { t: "Ajoutez vos produits", d: "Importez vos photos, fixez les prix et le stock, et ajoutez des couleurs et des tailles là où c'est utile." },
+  { t: "Partagez votre lien", d: "Envoyez-le sur Instagram, Facebook ou WhatsApp. Vos clients choisissent un produit et commandent en une minute." },
+  { t: "Confirmez et livrez", d: "Chaque commande arrive dans votre tableau de bord avec le numéro de téléphone et l'adresse. Appelez, confirmez, expédiez." },
 ];
 
 const FEATURES = [
-  { icon: Palette, t: "Looks like your brand", d: "Logo, banner, colors, font, product photo shape and an announcement bar. Every change shows live before you publish." },
-  { icon: PackageCheck, t: "Orders in one place", d: "No more orders lost in direct messages. Stock goes down by itself every time someone orders." },
-  { icon: Banknote, t: "Cash on delivery", d: "Your customers pay when the package arrives, so nobody needs a bank card to buy from you." },
+  { icon: Palette, t: "Aux couleurs de votre marque", d: "Logo, bannière, couleurs, police, forme des photos produits et bandeau d'annonce. Chaque modification s'affiche en direct avant la publication." },
+  { icon: PackageCheck, t: "Toutes vos commandes au même endroit", d: "Fini les commandes perdues dans les messages privés. Le stock baisse tout seul à chaque commande." },
+  { icon: Banknote, t: "Paiement à la livraison", d: "Vos clients paient à la réception du colis : personne n'a besoin d'une carte bancaire pour acheter chez vous." },
 ];
 
 const FAQ = [
-  { q: "Is VintrexShop free?", a: "You can open a store and start selling without paying to get started. If prices change, we will say so on this page before it affects you." },
-  { q: "How do my customers pay?", a: "They pay you in cash when the order is delivered. VintrexShop does not handle payments and does not take a cut of your sales." },
-  { q: "Do I need a website or a domain?", a: "No. Your store gets its own address, like vintrexshop.com/store/your-shop, ready to share." },
-  { q: "Can I run discounts and offers?", a: "Yes. Set a percentage or fixed discount, or an offer like buy 2, get 1 free, for all products or only the ones you pick." },
-  { q: "Who sees my customers' details?", a: "Only you, in your dashboard. Read our privacy policy for exactly what we store and why." },
+  { q: "VintrexShop est-il gratuit ?", a: "Vous pouvez ouvrir une boutique et commencer à vendre sans rien payer. Si les tarifs changent, nous l'indiquerons sur cette page avant que cela ne vous concerne." },
+  { q: "Comment mes clients paient-ils ?", a: "Ils vous paient en espèces à la livraison de la commande. VintrexShop ne gère pas les paiements et ne prélève aucune commission sur vos ventes." },
+  { q: "Ai-je besoin d'un site web ou d'un nom de domaine ?", a: "Non. Votre boutique a sa propre adresse, comme vintrexshop.com/store/votre-boutique, prête à être partagée." },
+  { q: "Puis-je proposer des remises et des offres ?", a: "Oui. Définissez une remise en pourcentage ou en montant fixe, ou une offre du type 2 achetés, 1 offert, pour tous les produits ou seulement ceux que vous choisissez." },
+  { q: "Qui voit les informations de mes clients ?", a: "Vous seul, dans votre tableau de bord. Lisez notre politique de confidentialité pour savoir exactement ce que nous conservons et pourquoi." },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -102,18 +102,18 @@ const PHOTO_TILES = heroPhotos.map((src) => (
 
 // Used only when the hero folder has no photos yet, so the page never looks empty
 const ICON_TILES = [
-  [Shirt, "Fashion", "#0F4C5C", "#2A8296"],
-  [Watch, "Watches", "#B8740E", "#E3A33A"],
+  [Shirt, "Mode", "#0F4C5C", "#2A8296"],
+  [Watch, "Montres", "#B8740E", "#E3A33A"],
   [Headphones, "Audio", "#1F4E8C", "#4D82C8"],
-  [Coffee, "Home & coffee", "#8A3A28", "#C8553D"],
-  [Gift, "Gifts", "#7A3E65", "#B0679A"],
-  [Truck, "Delivery", "#17212B", "#3C4C5C"],
-  [Smartphone, "Phones", "#0A3641", "#1E6A7E"],
-  [Footprints, "Sneakers", "#2F7D4F", "#5BAF7C"],
-  [Glasses, "Eyewear", "#5B4B8A", "#8C7CC0"],
-  [Gem, "Jewelry", "#A0415B", "#D4728A"],
-  [Backpack, "Bags", "#4A5A2A", "#7E9250"],
-  [Lamp, "Lighting", "#8C5A10", "#C98F2E"],
+  [Coffee, "Maison & café", "#8A3A28", "#C8553D"],
+  [Gift, "Cadeaux", "#7A3E65", "#B0679A"],
+  [Truck, "Livraison", "#17212B", "#3C4C5C"],
+  [Smartphone, "Téléphones", "#0A3641", "#1E6A7E"],
+  [Footprints, "Baskets", "#2F7D4F", "#5BAF7C"],
+  [Glasses, "Lunettes", "#5B4B8A", "#8C7CC0"],
+  [Gem, "Bijoux", "#A0415B", "#D4728A"],
+  [Backpack, "Sacs", "#4A5A2A", "#7E9250"],
+  [Lamp, "Éclairage", "#8C5A10", "#C98F2E"],
 ].map(([Icon, label, c1, c2]) => (
   <div key={label} className="gm-tile" style={{ background: `linear-gradient(135deg, ${c1}, ${c2})` }}>
     <span className="gm-icon"><Icon size={38} strokeWidth={1.6} /></span>
@@ -151,7 +151,7 @@ function StoreGrid({ stores }) {
               {s.logo_url ? <img className="lp-store-logo" src={s.logo_url} alt="" width="40" height="40" loading="lazy" /> : <b className="lp-store-logo lp-store-initial">{s.name.slice(0, 1)}</b>}
               <span>
                 <strong>{s.name}</strong>
-                <small>{s.tagline || "Visit store"}</small>
+                <small>{s.tagline || "Visiter la boutique"}</small>
               </span>
               <ArrowRight size={16} />
             </span>
@@ -182,7 +182,7 @@ function PopularStores() {
 
   // One card per store. With fewer than 8 stores, they repeat around the ring so it still looks full.
   const ringItems = useMemo(() => {
-    const base = stores.map((s) => ({ src: storeImage(s), alt: `${s.name} store`, title: s.name, subtitle: s.tagline || "Visit store", slug: s.slug }));
+    const base = stores.map((s) => ({ src: storeImage(s), alt: `Boutique ${s.name}`, title: s.name, subtitle: s.tagline || "Visiter la boutique", slug: s.slug }));
     if (base.length < 2 || base.length >= 8) return base;
     return Array.from({ length: 8 }, (_, i) => base[i % base.length]);
   }, [stores]);
@@ -203,11 +203,11 @@ function PopularStores() {
     <section className="lp-sec lp-wide" aria-labelledby="popular-h">
       <div className="lp-wrap">
         <div className="lp-head">
-          <h2 id="popular-h">Popular stores right now</h2>
+          <h2 id="popular-h">Les boutiques du moment</h2>
           <p>
             {ring
-              ? "Shops on VintrexShop with the most visitors. Drag the ring, click a store to bring it to the front, click it again to open it."
-              : "Shops on VintrexShop with the most visitors. Open one to see what a finished store looks like."}
+              ? "Les boutiques de VintrexShop les plus visitées. Faites glisser l'anneau, cliquez sur une boutique pour la mettre au premier plan, puis cliquez à nouveau pour l'ouvrir."
+              : "Les boutiques de VintrexShop les plus visitées. Ouvrez-en une pour voir à quoi ressemble une boutique terminée."}
           </p>
         </div>
 
@@ -233,9 +233,9 @@ function PopularStores() {
               </div>
             </SafeBackground>
             <div className="lp-ring-actions">
-              <Link className="btn btn-primary" to={`/store/${current.slug}`}>Visit {current.name} <ArrowRight size={16} /></Link>
+              <Link className="btn btn-primary" to={`/store/${current.slug}`}>Visiter {current.name} <ArrowRight size={16} /></Link>
               <p className="lp-ring-links">
-                All popular stores:{" "}
+                Toutes les boutiques populaires :{" "}
                 {stores.map((s, i) => (
                   <span key={s.slug}>{i > 0 && " · "}<Link to={`/store/${s.slug}`}>{s.name}</Link></span>
                 ))}
@@ -254,8 +254,8 @@ export default function Landing() {
   const { user } = useAuth();
   const wallReady = useWallReady();
   useSeo({
-    title: "VintrexShop - Open Your Online Store, Cash on Delivery",
-    description: "Create your own online store in minutes with VintrexShop. Add products, choose your colors, share one link and get paid in cash on delivery.",
+    title: "VintrexShop - Ouvrez votre boutique en ligne, paiement à la livraison",
+    description: "Créez votre boutique en ligne en quelques minutes avec VintrexShop. Ajoutez vos produits, choisissez vos couleurs, partagez un seul lien et soyez payé en espèces à la livraison.",
     path: "/",
   });
   return (
@@ -264,11 +264,11 @@ export default function Landing() {
         <Brand />
         <nav>
           {user ? (
-            <Link className="btn btn-primary" to="/dashboard">Open dashboard</Link>
+            <Link className="btn btn-primary" to="/dashboard">Ouvrir le tableau de bord</Link>
           ) : (
             <>
-              <Link className="btn btn-ghost" to="/login">Log in</Link>
-              <Link className="btn btn-primary" to="/signup">Open your store</Link>
+              <Link className="btn btn-ghost" to="/login">Se connecter</Link>
+              <Link className="btn btn-primary" to="/signup">Ouvrir ma boutique</Link>
             </>
           )}
         </nav>
@@ -285,15 +285,15 @@ export default function Landing() {
             )}
           </div>
           <section className="landing-hero">
-            <h1>Your shop gets its own address.</h1>
+            <h1>Votre boutique a sa propre adresse.</h1>
             <p className="lead">
-              Add your products, pick your colors, share one link. Customers order and pay when the package arrives.
+              Ajoutez vos produits, choisissez vos couleurs, partagez un seul lien. Vos clients commandent et paient à la réception du colis.
             </p>
-            <div className="url-pill" aria-label="Example store address">
+            <div className="url-pill" aria-label="Exemple d'adresse de boutique">
               <span>vintrexshop.com/store/</span><strong>urban-wear</strong>
             </div>
             <div className="hero-actions">
-              <Link className="btn btn-primary btn-lg" to="/signup">Open your store</Link>
+              <Link className="btn btn-primary btn-lg" to="/signup">Ouvrir ma boutique</Link>
             </div>
           </section>
         </div>
@@ -302,7 +302,7 @@ export default function Landing() {
 
         <section className="lp-sec" aria-labelledby="how-h">
           <div className="lp-wrap">
-            <div className="lp-head"><h2 id="how-h">From sign-up to first order</h2></div>
+            <div className="lp-head"><h2 id="how-h">De l'inscription à la première commande</h2></div>
             <ol className="lp-steps">
               {STEPS.map((s, i) => (
                 <li key={s.t}><span>{i + 1}</span><h3>{s.t}</h3><p>{s.d}</p></li>
@@ -313,7 +313,7 @@ export default function Landing() {
 
         <section className="lp-sec lp-tint" aria-labelledby="feat-h">
           <div className="lp-wrap">
-            <div className="lp-head"><h2 id="feat-h">Built for small sellers who deliver</h2></div>
+            <div className="lp-head"><h2 id="feat-h">Conçu pour les petits vendeurs qui livrent</h2></div>
             <div className="lp-feats">
               {FEATURES.map(({ icon: Icon, t, d }) => (
                 <article key={t}><Icon size={22} /><h3>{t}</h3><p>{d}</p></article>
@@ -324,7 +324,7 @@ export default function Landing() {
 
         <section className="lp-sec" aria-labelledby="faq-h">
           <div className="lp-wrap lp-faq">
-            <div className="lp-head"><h2 id="faq-h">Questions sellers ask</h2></div>
+            <div className="lp-head"><h2 id="faq-h">Les questions des vendeurs</h2></div>
             <div>
               {FAQ.map((f) => (
                 <details key={f.q}><summary>{f.q}</summary><p>{f.a}</p></details>
@@ -334,18 +334,18 @@ export default function Landing() {
         </section>
 
         <section className="lp-cta">
-          <h2>Ready to sell online?</h2>
-          <p>Your store can be live in a few minutes.</p>
-          <Link className="btn btn-primary btn-lg" to="/signup">Open your store</Link>
+          <h2>Prêt à vendre en ligne ?</h2>
+          <p>Votre boutique peut être en ligne en quelques minutes.</p>
+          <Link className="btn btn-primary btn-lg" to="/signup">Ouvrir ma boutique</Link>
         </section>
       </main>
 
       <footer className="landing-foot">
         <div className="lp-wrap lp-foot">
           <span>&copy; {new Date().getFullYear()} VintrexShop</span>
-          <nav aria-label="Legal">
-            <Link to="/privacy">Privacy policy</Link>
-            <Link to="/terms">Terms of use</Link>
+          <nav aria-label="Mentions légales">
+            <Link to="/privacy">Politique de confidentialité</Link>
+            <Link to="/terms">Conditions d'utilisation</Link>
             <Link to="/contact">Contact</Link>
           </nav>
         </div>

@@ -13,6 +13,9 @@ import { useStoreTheme } from "../store/StoreLayout.jsx";
 
 const uid = () => Math.random().toString(36).slice(2, 9);
 
+// The "saved" message is compared below to pick its color, so it lives in one place
+const SAVED = "Enregistré.";
+
 // Make sure older stores (without the new columns) still work.
 const normalize = (s) => ({
   ...s,
@@ -29,14 +32,14 @@ const normalize = (s) => ({
 function Scope({ value, onChange }) {
   return (
     <select value={value} onChange={(e) => onChange(e.target.value)}>
-      <option value="all">All products</option>
-      <option value="selected">Selected products</option>
+      <option value="all">Tous les produits</option>
+      <option value="selected">Produits sélectionnés</option>
     </select>
   );
 }
 
 function ProductPicker({ products, selected, onChange }) {
-  if (!products.length) return <small className="muted">Add products first, then pick them here.</small>;
+  if (!products.length) return <small className="muted">Ajoutez d'abord des produits, puis choisissez-les ici.</small>;
   const toggle = (id) => onChange(selected.includes(id) ? selected.filter((x) => x !== id) : [...selected, id]);
   return (
     <div className="picker">
@@ -70,7 +73,7 @@ export default function Customize() {
   const [demoMsg, setDemoMsg] = useState("");
   const demoCount = products.filter((p) => p.is_demo).length;
   async function runDemo(action) {
-    if (action === "remove" && !window.confirm("Delete all sample products? Products you added yourself stay.")) return;
+    if (action === "remove" && !window.confirm("Supprimer tous les produits d'exemple ? Les produits que vous avez ajoutés vous-même sont conservés.")) return;
     setDemoBusy(true);
     setDemoMsg("");
     const err = await (action === "add" ? seedDemoProducts(supabase, store.id) : removeDemoProducts(supabase, store.id));
@@ -95,7 +98,7 @@ export default function Customize() {
     setBusy(false);
     if (error) return setMsg(error.message);
     setStore(data);
-    setMsg("Saved.");
+    setMsg(SAVED);
   }
 
   // --- questions ---
@@ -128,10 +131,10 @@ export default function Customize() {
   return (
     <>
       <div className="page-head">
-        <h1>Customize</h1>
+        <h1>Personnaliser</h1>
         <div className="head-actions">
-          {msg && <span className={msg === "Saved." ? "muted" : "danger"}>{msg}</span>}
-          <button className="btn btn-primary" onClick={save} disabled={busy || !dirty}>{busy ? "Saving..." : "Save changes"}</button>
+          {msg && <span className={msg === SAVED ? "muted" : "danger"}>{msg}</span>}
+          <button className="btn btn-primary" onClick={save} disabled={busy || !dirty}>{busy ? "Enregistrement..." : "Enregistrer les modifications"}</button>
         </div>
       </div>
 
@@ -139,123 +142,123 @@ export default function Customize() {
         <div className="customize-form">
           <label className="check publish">
             <input type="checkbox" checked={draft.published} onChange={(e) => set("published", e.target.checked)} />
-            <span><strong>Store is public</strong><small>vintrexshop.com/store/{store.slug}</small></span>
+            <span><strong>La boutique est publique</strong><small>vintrexshop.com/store/{store.slug}</small></span>
           </label>
 
           <fieldset className="cz-section">
-            <legend>Sample products</legend>
+            <legend>Produits d'exemple</legend>
             <small className="muted">
               {products.length === 0
-                ? "Your store is empty. Add example products to see how it looks, then edit or delete them in Products."
+                ? "Votre boutique est vide. Ajoutez des produits d'exemple pour voir le rendu, puis modifiez-les ou supprimez-les dans Produits."
                 : demoCount > 0
-                  ? `${demoCount} sample products are in your store. Edit or delete them in Products, or remove them all here.`
-                  : "Add 6 example products (tees, hoodies, cap...) to preview your design."}
+                  ? `${demoCount} produits d'exemple sont dans votre boutique. Modifiez-les ou supprimez-les dans Produits, ou retirez-les tous ici.`
+                  : "Ajoutez 6 produits d'exemple (t-shirts, sweats à capuche, casquette...) pour prévisualiser votre design."}
             </small>
             <div className="variant-actions">
-              {demoCount === 0 && <button type="button" className="btn" onClick={() => runDemo("add")} disabled={demoBusy}>{demoBusy ? "Working..." : "Add sample products"}</button>}
-              {demoCount > 0 && <button type="button" className="btn btn-ghost danger" onClick={() => runDemo("remove")} disabled={demoBusy}>{demoBusy ? "Working..." : "Remove sample products"}</button>}
+              {demoCount === 0 && <button type="button" className="btn" onClick={() => runDemo("add")} disabled={demoBusy}>{demoBusy ? "Traitement en cours..." : "Ajouter des produits d'exemple"}</button>}
+              {demoCount > 0 && <button type="button" className="btn btn-ghost danger" onClick={() => runDemo("remove")} disabled={demoBusy}>{demoBusy ? "Traitement en cours..." : "Retirer les produits d'exemple"}</button>}
             </div>
             {demoMsg && <p className="msg msg-error" role="alert">{demoMsg}</p>}
           </fieldset>
 
           <fieldset className="cz-section">
-            <legend>Store info</legend>
-            <label>Store name<input value={draft.name} onChange={(e) => set("name", e.target.value)} /></label>
-            <label>Tagline<input value={draft.tagline || ""} onChange={(e) => set("tagline", e.target.value)} placeholder="Streetwear made in Tunis" /></label>
-            <label>Email for new-order alerts
-              <input type="email" value={draft.notify_email || ""} onChange={(e) => set("notify_email", e.target.value)} placeholder="Leave empty to use your login email" />
+            <legend>Informations de la boutique</legend>
+            <label>Nom de la boutique<input value={draft.name} onChange={(e) => set("name", e.target.value)} /></label>
+            <label>Slogan<input value={draft.tagline || ""} onChange={(e) => set("tagline", e.target.value)} placeholder="Streetwear conçu à Tunis" /></label>
+            <label>E-mail pour les alertes de nouvelle commande
+              <input type="email" value={draft.notify_email || ""} onChange={(e) => set("notify_email", e.target.value)} placeholder="Laissez vide pour utiliser votre e-mail de connexion" />
             </label>
-            <label>Top banner message<input value={draft.announcement || ""} onChange={(e) => set("announcement", e.target.value)} placeholder="Free delivery on orders over 100 TND" /></label>
-            <label>Small text above the title<input value={draft.hero_eyebrow || ""} onChange={(e) => set("hero_eyebrow", e.target.value)} placeholder="New collection 2026" /></label>
-            <label>Big title (leave empty to use the store name)<input value={draft.hero_title || ""} onChange={(e) => set("hero_title", e.target.value)} placeholder="Streetwear that tells your story" /></label>
-            <label>Phone (shown to customers)<input value={draft.phone || ""} onChange={(e) => set("phone", e.target.value)} placeholder="+216 20 000 000" /></label>
+            <label>Message de la bannière du haut<input value={draft.announcement || ""} onChange={(e) => set("announcement", e.target.value)} placeholder="Livraison gratuite dès 100 TND d'achat" /></label>
+            <label>Petit texte au-dessus du titre<input value={draft.hero_eyebrow || ""} onChange={(e) => set("hero_eyebrow", e.target.value)} placeholder="Nouvelle collection 2026" /></label>
+            <label>Grand titre (laissez vide pour utiliser le nom de la boutique)<input value={draft.hero_title || ""} onChange={(e) => set("hero_title", e.target.value)} placeholder="Un streetwear qui raconte votre histoire" /></label>
+            <label>Téléphone (affiché aux clients)<input value={draft.phone || ""} onChange={(e) => set("phone", e.target.value)} placeholder="+216 20 000 000" /></label>
           </fieldset>
 
           <fieldset className="cz-section">
-            <legend>Look and feel</legend>
+            <legend>Apparence</legend>
             <ImageField label="Logo" shape="square" value={draft.logo_url} onChange={(v) => set("logo_url", v)} userId={user.id} />
-            <ImageField label="Banner" value={draft.banner_url} onChange={(v) => set("banner_url", v)} userId={user.id} />
+            <ImageField label="Bannière" value={draft.banner_url} onChange={(v) => set("banner_url", v)} userId={user.id} />
 
             <div className="row-2">
-              <label>Main color<input type="color" value={draft.primary_color} onChange={(e) => set("primary_color", e.target.value)} /></label>
-              <label>Button color<input type="color" value={draft.accent_color} onChange={(e) => set("accent_color", e.target.value)} /></label>
+              <label>Couleur principale<input type="color" value={draft.primary_color} onChange={(e) => set("primary_color", e.target.value)} /></label>
+              <label>Couleur des boutons<input type="color" value={draft.accent_color} onChange={(e) => set("accent_color", e.target.value)} /></label>
             </div>
 
             <div className="bg-row">
-              <label>Background color
+              <label>Couleur d'arrière-plan
                 <input type="color" value={draft.bg_color || "#ffffff"} onChange={(e) => set("bg_color", e.target.value)} />
               </label>
               {draft.bg_color && (
-                <button type="button" className="btn btn-ghost" onClick={() => set("bg_color", "")}>Reset to default</button>
+                <button type="button" className="btn btn-ghost" onClick={() => set("bg_color", "")}>Rétablir par défaut</button>
               )}
             </div>
 
-            <label>Font
+            <label>Police
               <select value={draft.font} onChange={(e) => set("font", e.target.value)}>
                 {FONT_OPTIONS.map((f) => <option key={f.name}>{f.name}</option>)}
               </select>
             </label>
 
-            <label>Top section
+            <label>Section du haut
               <select value={draft.hero_style} onChange={(e) => set("hero_style", e.target.value)}>
-                <option value="banner">Banner image</option>
-                <option value="minimal">Name only</option>
+                <option value="banner">Image de bannière</option>
+                <option value="minimal">Nom uniquement</option>
               </select>
             </label>
 
-            <label>Product size: {draft.card_size ?? 260}px
+            <label>Taille des produits : {draft.card_size ?? 260}px
               <input type="range" min="160" max="420" step="10" value={draft.card_size ?? 260} onChange={(e) => set("card_size", Number(e.target.value))} />
-              <small className="muted">Smaller sizes fit more products per row.</small>
+              <small className="muted">Les tailles plus petites permettent d'afficher plus de produits par ligne.</small>
             </label>
-            <label>Product photo shape
+            <label>Forme des photos produits
               <select value={draft.image_ratio ?? "portrait"} onChange={(e) => set("image_ratio", e.target.value)}>
-                <option value="portrait">Portrait (tall)</option>
-                <option value="square">Square</option>
-                <option value="landscape">Landscape (wide)</option>
+                <option value="portrait">Portrait (haut)</option>
+                <option value="square">Carré</option>
+                <option value="landscape">Paysage (large)</option>
               </select>
             </label>
 
-            <label className="check"><input type="checkbox" checked={draft.show_categories} onChange={(e) => set("show_categories", e.target.checked)} /> Show category filter</label>
+            <label className="check"><input type="checkbox" checked={draft.show_categories} onChange={(e) => set("show_categories", e.target.checked)} /> Afficher le filtre par catégorie</label>
           </fieldset>
 
           <fieldset className="cz-section">
-            <legend>Questions and answers</legend>
-            <label className="check"><input type="checkbox" checked={draft.show_faq} onChange={(e) => set("show_faq", e.target.checked)} /> Show questions section</label>
+            <legend>Questions et réponses</legend>
+            <label className="check"><input type="checkbox" checked={draft.show_faq} onChange={(e) => set("show_faq", e.target.checked)} /> Afficher la section questions</label>
             {draft.show_faq && (
               <>
                 {draft.faqs.map((f, i) => (
                   <div key={i} className="offer-card">
                     <label>Question<input value={f.q} onChange={(e) => setFaq(i, { q: e.target.value })} /></label>
-                    <label>Answer<textarea rows={2} value={f.a} onChange={(e) => setFaq(i, { a: e.target.value })} /></label>
-                    <button type="button" className="btn btn-ghost danger" onClick={() => removeFaq(i)}>Remove</button>
+                    <label>Réponse<textarea rows={2} value={f.a} onChange={(e) => setFaq(i, { a: e.target.value })} /></label>
+                    <button type="button" className="btn btn-ghost danger" onClick={() => removeFaq(i)}>Supprimer</button>
                   </div>
                 ))}
-                <button type="button" className="btn" onClick={addFaq}>Add a question</button>
+                <button type="button" className="btn" onClick={addFaq}>Ajouter une question</button>
               </>
             )}
           </fieldset>
 
           <fieldset className="cz-section">
-            <legend>Discount</legend>
+            <legend>Remise</legend>
             <label className="check">
               <input type="checkbox" checked={d.enabled} onChange={(e) => setDiscount({ enabled: e.target.checked })} />
-              <span><strong>Run a discount</strong><small>Customers see the old price crossed out.</small></span>
+              <span><strong>Appliquer une remise</strong><small>Vos clients voient l'ancien prix barré.</small></span>
             </label>
             {d.enabled && (
               <>
                 <div className="row-2">
                   <label>Type
                     <select value={d.type} onChange={(e) => setDiscount({ type: e.target.value })}>
-                      <option value="percent">Percent off (%)</option>
-                      <option value="fixed">Fixed amount off (TND)</option>
+                      <option value="percent">Réduction en pourcentage (%)</option>
+                      <option value="fixed">Réduction d'un montant fixe (TND)</option>
                     </select>
                   </label>
-                  <label>Value
+                  <label>Valeur
                     <input type="number" min="0" max={d.type === "percent" ? 100 : undefined} step="any" value={d.value}
                       onChange={(e) => setDiscount({ value: Number(e.target.value) })} />
                   </label>
                 </div>
-                <label>Applies to<Scope value={d.scope} onChange={(v) => setDiscount({ scope: v })} /></label>
+                <label>S'applique à<Scope value={d.scope} onChange={(v) => setDiscount({ scope: v })} /></label>
                 {d.scope === "selected" && (
                   <ProductPicker products={products} selected={d.product_ids} onChange={(ids) => setDiscount({ product_ids: ids })} />
                 )}
@@ -264,30 +267,30 @@ export default function Customize() {
           </fieldset>
 
           <fieldset className="cz-section">
-            <legend>Offers</legend>
-            <small className="muted">Example: buy 2, get 3 free.</small>
+            <legend>Offres</legend>
+            <small className="muted">Exemple : achetez 2, obtenez 3 offerts.</small>
             {draft.offers.map((o) => (
               <div key={o.id} className="offer-card">
                 <div className="offer-line">
-                  <span>Buy</span>
+                  <span>Achetez</span>
                   <input type="number" min="1" value={o.buy} onChange={(e) => setOffer(o.id, { buy: Math.max(1, Number(e.target.value)) })} />
-                  <span>get</span>
+                  <span>obtenez</span>
                   <input type="number" min="1" value={o.free} onChange={(e) => setOffer(o.id, { free: Math.max(1, Number(e.target.value)) })} />
-                  <span>free</span>
-                  <button type="button" className="btn btn-ghost danger" onClick={() => removeOffer(o.id)}>Remove</button>
+                  <span>offert(s)</span>
+                  <button type="button" className="btn btn-ghost danger" onClick={() => removeOffer(o.id)}>Supprimer</button>
                 </div>
-                <label>Applies to<Scope value={o.scope} onChange={(v) => setOffer(o.id, { scope: v })} /></label>
+                <label>S'applique à<Scope value={o.scope} onChange={(v) => setOffer(o.id, { scope: v })} /></label>
                 {o.scope === "selected" && (
                   <ProductPicker products={products} selected={o.product_ids} onChange={(ids) => setOffer(o.id, { product_ids: ids })} />
                 )}
               </div>
             ))}
-            <button type="button" className="btn" onClick={addOffer}>Add an offer</button>
+            <button type="button" className="btn" onClick={addOffer}>Ajouter une offre</button>
           </fieldset>
         </div>
 
         <div className="preview-frame">
-          <div className="preview-bar">Live preview</div>
+          <div className="preview-bar">Aperçu en direct</div>
           <div className="store-root" style={themeStyle}>
             <Announcement text={draft.announcement} />
             <StoreHeader store={draft} categories={uniqueCategories(products)} />

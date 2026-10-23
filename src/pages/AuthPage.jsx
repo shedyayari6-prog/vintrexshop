@@ -12,7 +12,7 @@ export default function AuthPage({ mode }) {
     return (
       <div className="auth-wrap">
         <div className="auth-card" style={{ textAlign: "center", padding: "40px" }}>
-          <p>Loading session...</p>
+          <p>Chargement de la session...</p>
         </div>
       </div>
     );
@@ -26,16 +26,16 @@ export default function AuthPage({ mode }) {
       <style>{`.auth-oauth-only .or { display: none; }`}</style>
       <div className="auth-card">
         <Brand />
-        <h1>{isSignup ? "Open your store" : "Welcome back"}</h1>
+        <h1>{isSignup ? "Ouvrez votre boutique" : "Bon retour"}</h1>
         <p className="muted">
-          {isSignup ? "Choose an account below to create your store." : "Choose your account below to log in."}
+          {isSignup ? "Choisissez un compte ci-dessous pour créer votre boutique." : "Choisissez votre compte ci-dessous pour vous connecter."}
         </p>
 
         <OAuthButtons />
 
         <p className="auth-switch">
-          {isSignup ? <>Already have a store? <Link to="/login">Log in</Link></>
-                    : <>New here? <Link to="/signup">Open your store</Link></>}
+          {isSignup ? <>Vous avez déjà une boutique ? <Link to="/login">Se connecter</Link></>
+                    : <>Nouveau ici ? <Link to="/signup">Ouvrir ma boutique</Link></>}
         </p>
       </div>
     </div>

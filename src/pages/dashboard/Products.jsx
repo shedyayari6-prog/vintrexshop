@@ -19,8 +19,8 @@ function ProductForm({ initial, storeId, userId, onClose, onSaved }) {
     e.preventDefault();
     setError("");
     const price = parseFloat(form.price);
-    if (!form.name.trim()) return setError("Enter a product name.");
-    if (Number.isNaN(price) || price < 0) return setError("Enter a valid price.");
+    if (!form.name.trim()) return setError("Saisissez un nom de produit.");
+    if (Number.isNaN(price) || price < 0) return setError("Saisissez un prix valide.");
     setBusy(true);
     const row = {
       name: form.name.trim(),
@@ -37,7 +37,7 @@ function ProductForm({ initial, storeId, userId, onClose, onSaved }) {
       : await supabase.from("products").insert({ ...row, store_id: storeId });
     setBusy(false);
     if (error) {
-      const hint = /options/i.test(error.message) ? " Run the SQL line that adds the options column in Supabase first." : "";
+      const hint = /options/i.test(error.message) ? " Exécutez d'abord dans Supabase la ligne SQL qui ajoute la colonne options." : "";
       return setError(error.message + hint);
     }
     onSaved();
@@ -46,21 +46,21 @@ function ProductForm({ initial, storeId, userId, onClose, onSaved }) {
   return (
     <div className="modal-back" onClick={onClose}>
       <form className="modal" onClick={(e) => e.stopPropagation()} onSubmit={save}>
-        <h2>{form.id ? "Edit product" : "Add product"}</h2>
+        <h2>{form.id ? "Modifier le produit" : "Ajouter un produit"}</h2>
         <ImageField label="Photo" shape="square" value={form.image_url} onChange={(v) => set("image_url", v)} userId={userId} />
-        <label>Name<input value={form.name} onChange={(e) => set("name", e.target.value)} required /></label>
+        <label>Nom<input value={form.name} onChange={(e) => set("name", e.target.value)} required /></label>
         <div className="row-2">
-          <label>Price (DT)<input type="number" step="0.001" min="0" value={form.price} onChange={(e) => set("price", e.target.value)} required /></label>
-          <label>In stock<input type="number" min="0" value={form.stock} onChange={(e) => set("stock", e.target.value)} /></label>
+          <label>Prix (DT)<input type="number" step="0.001" min="0" value={form.price} onChange={(e) => set("price", e.target.value)} required /></label>
+          <label>En stock<input type="number" min="0" value={form.stock} onChange={(e) => set("stock", e.target.value)} /></label>
         </div>
-        <label>Category<input value={form.category} onChange={(e) => set("category", e.target.value)} placeholder="T-shirts" /></label>
+        <label>Catégorie<input value={form.category} onChange={(e) => set("category", e.target.value)} placeholder="T-shirts" /></label>
         <label>Description<textarea rows={3} value={form.description} onChange={(e) => set("description", e.target.value)} /></label>
         <VariantsField value={form.options || []} onChange={(v) => set("options", v)} />
-        <label className="check"><input type="checkbox" checked={form.available} onChange={(e) => set("available", e.target.checked)} /> Show in store</label>
+        <label className="check"><input type="checkbox" checked={form.available} onChange={(e) => set("available", e.target.checked)} /> Afficher dans la boutique</label>
         {error && <p className="msg msg-error" role="alert">{error}</p>}
         <div className="modal-actions">
-          <button type="button" className="btn btn-ghost" onClick={onClose}>Cancel</button>
-          <button className="btn btn-primary" disabled={busy}>{busy ? "Saving..." : "Save product"}</button>
+          <button type="button" className="btn btn-ghost" onClick={onClose}>Annuler</button>
+          <button className="btn btn-primary" disabled={busy}>{busy ? "Enregistrement..." : "Enregistrer le produit"}</button>
         </div>
       </form>
     </div>
@@ -82,7 +82,7 @@ export default function Products() {
   useEffect(() => { load(); }, [load]);
 
   async function remove(p) {
-    if (!window.confirm(`Delete "${p.name}"? This cannot be undone.`)) return;
+    if (!window.confirm(`Supprimer « ${p.name} » ? Cette action est irréversible.`)) return;
     await supabase.from("products").delete().eq("id", p.id);
     load();
   }
@@ -94,44 +94,44 @@ export default function Products() {
   return (
     <>
       <div className="page-head">
-        <h1>Products</h1>
+        <h1>Produits</h1>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-          <ShareButton label="Share store" url={storeUrl} title={store.name} text={`Shop at ${store.name}`} />
-          <button className="btn btn-primary" onClick={() => setEditing(EMPTY)}><Plus size={16} /> Add product</button>
+          <ShareButton label="Partager la boutique" url={storeUrl} title={store.name} text={`Découvrez ${store.name}`} />
+          <button className="btn btn-primary" onClick={() => setEditing(EMPTY)}><Plus size={16} /> Ajouter un produit</button>
         </div>
       </div>
 
-      {loading ? <p>Loading...</p> : products.length === 0 ? (
+      {loading ? <p>Chargement...</p> : products.length === 0 ? (
         <div className="empty">
-          <p>No products yet. Add your first one and it will appear on your store.</p>
-          <button className="btn btn-primary" onClick={() => setEditing(EMPTY)}>Add product</button>
+          <p>Aucun produit pour le moment. Ajoutez le premier et il apparaîtra dans votre boutique.</p>
+          <button className="btn btn-primary" onClick={() => setEditing(EMPTY)}>Ajouter un produit</button>
         </div>
       ) : (
         <div className="table-wrap">
           <table>
-            <thead><tr><th></th><th>Name</th><th>Price</th><th>Stock</th><th>Status</th><th></th></tr></thead>
+            <thead><tr><th></th><th>Nom</th><th>Prix</th><th>Stock</th><th>Statut</th><th></th></tr></thead>
             <tbody>
               {products.map((p) => (
                 <tr key={p.id}>
                   <td className="thumb-cell">{p.image_url ? <img src={p.image_url} alt="" /> : <div className="thumb-empty" />}</td>
                   <td><strong>{p.name}</strong><div className="muted">{p.category}</div></td>
                   <td>{formatPrice(p.price)}</td>
-                  <td className={p.stock === 0 ? "danger" : ""}>{p.stock === 0 ? "Sold out" : p.stock}</td>
-                  <td>{p.available ? "Visible" : "Hidden"}</td>
+                  <td className={p.stock === 0 ? "danger" : ""}>{p.stock === 0 ? "Épuisé" : p.stock}</td>
+                  <td>{p.available ? "Visible" : "Masqué"}</td>
                   <td className="actions">
                     {/* Hidden products can't be opened by customers, so no share link for them */}
                     {p.available && (
                       <ShareButton
                         variant="icon"
                         className="share-flat"
-                        label={`Share ${p.name}`}
+                        label={`Partager ${p.name}`}
                         url={productUrl(p)}
                         title={p.name}
                         text={`${p.name} - ${formatPrice(p.price)} | ${store.name}`}
                       />
                     )}
-                    <button className="icon-btn" onClick={() => setEditing({ ...p, price: String(p.price), options: p.options || [] })} aria-label={`Edit ${p.name}`}><Pencil size={16} /></button>
-                    <button className="icon-btn" onClick={() => remove(p)} aria-label={`Delete ${p.name}`}><Trash2 size={16} /></button>
+                    <button className="icon-btn" onClick={() => setEditing({ ...p, price: String(p.price), options: p.options || [] })} aria-label={`Modifier ${p.name}`}><Pencil size={16} /></button>
+                    <button className="icon-btn" onClick={() => remove(p)} aria-label={`Supprimer ${p.name}`}><Trash2 size={16} /></button>
                   </td>
                 </tr>
               ))}

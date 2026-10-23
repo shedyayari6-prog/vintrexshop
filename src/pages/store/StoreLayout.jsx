@@ -77,13 +77,13 @@ export default function StoreLayout() {
     return () => { cancelled = true; };
   }, [slug]);
 
-  if (state === "loading") return <div className="center-note">Loading store...</div>;
+  if (state === "loading") return <div className="center-note">Chargement de la boutique...</div>;
   if (state === "missing") {
     return (
       <div className="center-note">
-        <h1>Store not found</h1>
-        <p>This store doesn't exist or isn't public yet.</p>
-        <Link to="/" className="btn btn-primary">Go to VintrexShop</Link>
+        <h1>Boutique introuvable</h1>
+        <p>Cette boutique n'existe pas ou n'est pas encore publique.</p>
+        <Link to="/" className="btn btn-primary">Aller sur VintrexShop</Link>
       </div>
     );
   }

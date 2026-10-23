@@ -5,7 +5,7 @@ import { supabase } from "../../lib/supabase.js";
 import { formatPrice } from "../../lib/utils.js";
 import { lineTotal } from "../../lib/pricing.js";
 
-const variantText = (v = {}) => [v.color && `Color ${v.color}`, v.size && `Size ${v.size}`].filter(Boolean).join(", ");
+const variantText = (v = {}) => [v.color && `Couleur ${v.color}`, v.size && `Taille ${v.size}`].filter(Boolean).join(", ");
 
 export default function CartPage() {
   const { store, products, cart, base } = useOutletContext();
@@ -31,8 +31,8 @@ export default function CartPage() {
   if (cart.items.length === 0) {
     return (
       <div className="s-empty">
-        <h1>Your cart is empty</h1>
-        <Link className="s-btn" to={base}>Browse products</Link>
+        <h1>Votre panier est vide</h1>
+        <Link className="s-btn" to={base}>Parcourir les produits</Link>
       </div>
     );
   }
@@ -40,10 +40,10 @@ export default function CartPage() {
   async function placeOrder(e) {
     e.preventDefault();
     setError("");
-    if (!/^[+\d][\d\s]{6,}$/.test(form.phone.trim())) return setError("Enter a valid phone number.");
+    if (!/^[+\d][\d\s]{6,}$/.test(form.phone.trim())) return setError("Saisissez un numéro de téléphone valide.");
     setBusy(true);
     // Colors/sizes go in the note so the seller sees them (no database change needed)
-    const optionLines = cart.items.filter((i) => variantText(i.variant)).map((i) => `${i.name} x${i.quantity}: ${variantText(i.variant)}`);
+    const optionLines = cart.items.filter((i) => variantText(i.variant)).map((i) => `${i.name} x${i.quantity} : ${variantText(i.variant)}`);
     const note = [optionLines.length ? `Options - ${optionLines.join("; ")}` : "", form.note].filter(Boolean).join("\n");
     const { error } = await supabase.rpc("place_order", {
       p_store_id: store.id,
@@ -63,7 +63,7 @@ export default function CartPage() {
   return (
     <div className="s-checkout">
       <section>
-        <h1>Your cart</h1>
+        <h1>Votre panier</h1>
         <ul className="cart-list">
           {cart.items.map((i) => {
             const l = info(i.id);
@@ -79,32 +79,32 @@ export default function CartPage() {
                     {formatPrice(unit)}
                   </span>
                   <div className="qty qty-sm">
-                    <button onClick={() => cart.setQty(i.key, i.quantity - 1)} aria-label="Fewer">-</button>
+                    <button onClick={() => cart.setQty(i.key, i.quantity - 1)} aria-label="Moins">-</button>
                     <span>{i.quantity}</span>
-                    <button onClick={() => cart.setQty(i.key, i.quantity + 1)} aria-label="More">+</button>
+                    <button onClick={() => cart.setQty(i.key, i.quantity + 1)} aria-label="Plus">+</button>
                   </div>
                 </div>
-                <button className="icon-btn" onClick={() => cart.remove(i.key)} aria-label={`Remove ${i.name}`}><Trash2 size={16} /></button>
+                <button className="icon-btn" onClick={() => cart.remove(i.key)} aria-label={`Retirer ${i.name}`}><Trash2 size={16} /></button>
               </li>
             );
           })}
         </ul>
         {freebies.map((l) => (
-          <p key={l.product.id} className="cart-free">{l.freeUnits} free: {l.product.name}</p>
+          <p key={l.product.id} className="cart-free">{l.freeUnits} offert{l.freeUnits > 1 ? "s" : ""} : {l.product.name}</p>
         ))}
         <p className="cart-total"><span>Total</span><strong>{formatPrice(total)}</strong></p>
       </section>
 
       <form className="s-form" onSubmit={placeOrder}>
-        <h2>Delivery details</h2>
-        <label>Full name<input required value={form.name} onChange={(e) => set("name", e.target.value)} autoComplete="name" /></label>
-        <label>Phone<input required type="tel" value={form.phone} onChange={(e) => set("phone", e.target.value)} autoComplete="tel" /></label>
-        <label>City<input required value={form.city} onChange={(e) => set("city", e.target.value)} /></label>
-        <label>Address<input required value={form.address} onChange={(e) => set("address", e.target.value)} autoComplete="street-address" /></label>
-        <label>Note (optional)<textarea rows={2} value={form.note} onChange={(e) => set("note", e.target.value)} /></label>
-        <p className="muted">You pay in cash when your order arrives.</p>
+        <h2>Informations de livraison</h2>
+        <label>Nom complet<input required value={form.name} onChange={(e) => set("name", e.target.value)} autoComplete="name" /></label>
+        <label>Téléphone<input required type="tel" value={form.phone} onChange={(e) => set("phone", e.target.value)} autoComplete="tel" /></label>
+        <label>Ville<input required value={form.city} onChange={(e) => set("city", e.target.value)} /></label>
+        <label>Adresse<input required value={form.address} onChange={(e) => set("address", e.target.value)} autoComplete="street-address" /></label>
+        <label>Note (facultatif)<textarea rows={2} value={form.note} onChange={(e) => set("note", e.target.value)} /></label>
+        <p className="muted">Vous payez en espèces à la réception de votre commande.</p>
         {error && <p className="msg msg-error" role="alert">{error}</p>}
-        <button className="s-btn s-btn-block" disabled={busy}>{busy ? "Placing order..." : `Place order - ${formatPrice(total)}`}</button>
+        <button className="s-btn s-btn-block" disabled={busy}>{busy ? "Envoi de la commande..." : `Passer la commande - ${formatPrice(total)}`}</button>
       </form>
     </div>
   );

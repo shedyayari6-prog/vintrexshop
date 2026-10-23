@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { NavLink, Navigate, Outlet } from "react-router-dom";
-import { BarChart3, Package, ClipboardList, Palette, Settings, ExternalLink, LogOut } from "lucide-react";
+import { BarChart3, Package, ClipboardList, Truck, Palette, Settings, ExternalLink, LogOut } from "lucide-react";
 import { useAuth } from "../../lib/AuthContext.jsx";
 import { supabase } from "../../lib/supabase.js";
 import { slugify } from "../../lib/utils.js";
@@ -83,6 +83,7 @@ export default function DashboardLayout() {
           <NavLink to="stats"><BarChart3 size={18} /> Statistics</NavLink>
           <NavLink to="products"><Package size={18} /> Products</NavLink>
           <NavLink to="orders"><ClipboardList size={18} /> Orders</NavLink>
+          <NavLink to="delivery"><Truck size={18} /> Livraison</NavLink>
           <NavLink to="customize"><Palette size={18} /> Customize</NavLink>
           <NavLink to="settings"><Settings size={18} /> Settings</NavLink>
         </nav>

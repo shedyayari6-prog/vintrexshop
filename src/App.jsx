@@ -12,6 +12,7 @@ const Contact = lazy(() => import("./pages/Legal.jsx").then((m) => ({ default: m
 const DashboardLayout = lazy(() => import("./pages/dashboard/DashboardLayout.jsx"));
 const Products = lazy(() => import("./pages/dashboard/Products.jsx"));
 const Orders = lazy(() => import("./pages/dashboard/Orders.jsx"));
+const Delivery = lazy(() => import("./pages/dashboard/Delivery.jsx"));
 const Stats = lazy(() => import("./pages/dashboard/Stats.jsx"));
 const Customize = lazy(() => import("./pages/dashboard/Customize.jsx"));
 const Settings = lazy(() => import("./pages/dashboard/Settings.jsx"));
@@ -53,6 +54,7 @@ export default function App() {
           <Route path="stats" element={<Stats />} />
           <Route path="products" element={<Products />} />
           <Route path="orders" element={<Orders />} />
+          <Route path="delivery" element={<Delivery />} />
           <Route path="customize" element={<Customize />} />
           <Route path="settings" element={<Settings />} />
         </Route>

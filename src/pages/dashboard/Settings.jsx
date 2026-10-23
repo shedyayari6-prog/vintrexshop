@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import { supabase } from "../../lib/supabase.js";
 import DodgeField from "../../components/react-bits/DodgeField.jsx";
 
@@ -69,6 +69,13 @@ export default function Settings() {
       <section className="panel">
         <h2>Account</h2>
         <p className="muted">Logged in as <strong>{user.email}</strong></p>
+      </section>
+
+      <section className="panel">
+        <h2>Livraison (ABM Delivery)</h2>
+        <p className="muted">
+          Votre adresse d'enlèvement et vos colis sont gérés dans la page <Link to="/dashboard/delivery">Livraison</Link>.
+        </p>
       </section>
 
       <section className="panel danger-zone">
