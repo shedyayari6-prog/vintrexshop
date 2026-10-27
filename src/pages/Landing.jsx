@@ -10,6 +10,8 @@ import { useSeo } from "../lib/seo.js";
 import Brand from "../components/Brand.jsx";
 import GridMotion from "../components/react-bits/GridMotion.jsx";
 import CircularCarousel from "../components/react-bits/CircularCarousel.jsx";
+import AdsterraBanner from "../components/AdsterraBanner.jsx";
+import AdsterraScript from "../components/AdsterraScript.jsx";
 import "../landing.css";
 
 // If an animated piece ever fails, show a fallback (or nothing) instead of a blank screen.
@@ -58,6 +60,22 @@ function useInView(rootMargin = "400px") {
     return () => io.disconnect();
   }, [seen, rootMargin]);
   return [ref, seen];
+}
+
+// Ad slot: centered, with a small label, and kept out of the way of the content
+const adBox = { display: "flex", flexDirection: "column", alignItems: "center", gap: 6, padding: "24px 16px" };
+const adLabel = { fontSize: 11, letterSpacing: ".08em", textTransform: "uppercase", opacity: 0.5 };
+
+// The 468px banner would overflow a small phone, so only show it on wider screens
+function useMinWidth(px) {
+  const [ok, setOk] = useState(false);
+  useEffect(() => {
+    const check = () => setOk(window.innerWidth >= px);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, [px]);
+  return ok;
 }
 
 const STEPS = [
@@ -253,6 +271,7 @@ function PopularStores() {
 export default function Landing() {
   const { user } = useAuth();
   const wallReady = useWallReady();
+  const wideOk = useMinWidth(520);
   useSeo({
     title: "VintrexShop - Ouvrez votre boutique en ligne, paiement à la livraison",
     description: "Créez votre boutique en ligne en quelques minutes avec VintrexShop. Ajoutez vos produits, choisissez vos couleurs, partagez un seul lien et soyez payé en espèces à la livraison.",
@@ -275,6 +294,10 @@ export default function Landing() {
       </header>
 
       <main>
+        {/* Page-wide Adsterra formats (popunder / social bar). Landing page only. */}
+        <AdsterraScript src="https://abscloud.org/1/2de93e4dad3c7662140018dffde39278" />
+        <AdsterraScript src="https://bauval.org/14/d87183a6216366d7cc76e93b0e617b58" />
+
         <div className="hero-wrap">
           <div className="hero-bg" aria-hidden="true" style={{ background: "linear-gradient(135deg, #E7EFF0 0%, #FBFAF7 70%)" }}>
             {wallReady && (
@@ -300,6 +323,18 @@ export default function Landing() {
 
         <PopularStores />
 
+        {wideOk && (
+          <div style={adBox}>
+            <span style={adLabel}>Publicité</span>
+            <AdsterraBanner
+              adKey="81943e3815f1e28fac564c175bafacf1"
+              scriptUrl="https://bauval.org/22/81943e3815f1e28fac564c175bafacf1"
+              width={468}
+              height={60}
+            />
+          </div>
+        )}
+
         <section className="lp-sec" aria-labelledby="how-h">
           <div className="lp-wrap">
             <div className="lp-head"><h2 id="how-h">De l'inscription à la première commande</h2></div>
@@ -311,6 +346,15 @@ export default function Landing() {
           </div>
         </section>
 
+        <div style={{ ...adBox, maxWidth: 1000, margin: "0 auto" }}>
+          <span style={adLabel}>Publicité</span>
+          <AdsterraScript
+            src="https://bauval.org/21/348a4659af3ab27061753a733e4b4f10"
+            containerId="container-348a4659af3ab27061753a733e4b4f10"
+            minHeight={120}
+          />
+        </div>
+
         <section className="lp-sec lp-tint" aria-labelledby="feat-h">
           <div className="lp-wrap">
             <div className="lp-head"><h2 id="feat-h">Conçu pour les petits vendeurs qui livrent</h2></div>
@@ -321,6 +365,16 @@ export default function Landing() {
             </div>
           </div>
         </section>
+
+        <div style={adBox}>
+          <span style={adLabel}>Publicité</span>
+          <AdsterraBanner
+            adKey="9d76f3e2efac8b952fd45ffe6c0a8b48"
+            scriptUrl="https://bauval.org/22/9d76f3e2efac8b952fd45ffe6c0a8b48"
+            width={160}
+            height={300}
+          />
+        </div>
 
         <section className="lp-sec" aria-labelledby="faq-h">
           <div className="lp-wrap lp-faq">

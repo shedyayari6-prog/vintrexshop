@@ -99,3 +99,5 @@
 .lp-ring-links a { color: var(--teal); text-decoration: none; font-weight: 600; }
 .lp-ring-links a:hover { text-decoration: underline; }
 @media (max-width: 760px) { .lp-ring { height: 460px; } }
+.lp-ad { display: flex; justify-content: center; padding: 24px 16px; }
+@media (max-width: 520px) { .lp-ad-wide { display: none; } }
